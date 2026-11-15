@@ -1,0 +1,44 @@
+# dsh-dsglm-only — 一条只含 DeepSeek / 智谱 GLM 的聚合路由。
+#
+# 装法：把本包加到 profile 的 dependencies（link: 本地路径或 npm 版本），
+# 再把 "dsh-dsglm-only" 追加到 dsh.profile.bundles 里。
+# 本文件由 bundle 装配时自动并入 patch 层，不需要手工复制到 profile。
+
+- insert:
+    - id: dsh-dsglm-only
+      name: dsh-dsglm-only
+      config:
+        # false = 整条路由下线（模型从选择器消失，注册一并释放）。
+        enabled: true
+
+        # 路由名与展示名。providerId 改动后选择器里是新的分组。
+        providerId: dsglm
+        providerName: DeepSeek · GLM（多渠聚合）
+
+        # dsh-providers-hub 的 OpenAI 兼容网关。0.0.0.0 之外只接受本机。
+        gatewayBaseUrl: http://127.0.0.1:8326/v1
+
+        # 网关 Bearer 密钥文件；留空 = $DSH_HOME/openai-gateway/api-key
+        apiKeyFile: ''
+
+        # 目录落盘缓存（网关没起来时选择器仍有内容）；留空 = $DSH_HOME/dsglm-only/catalog.json
+        cacheFile: ''
+
+        # 同一逻辑模型在多个渠道出现时的尝试顺序，越靠前越先试。
+        # 未列出的渠道排在最后。官方账号优先，聚合路由兜底。
+        providerPriority:
+          - deepseek-official
+          - deepseek-account
+          - workbuddy
+          - workbuddy-global
+          - trae
+          - zcode
+          - buddy
+          - qoder
+          - qodercn
+          - opencode
+          - opencode2dsh
+          - aggregate
+
+        # 单次请求最多尝试几个候选渠道（1–12）。1 = 只试首选，不回退。
+        maxCandidates: 3
